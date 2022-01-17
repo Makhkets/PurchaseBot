@@ -1,0 +1,32 @@
+{
+
+    "settings" : {
+        "time_sleep" : "5",
+        "key" : "CSSLU-EVBNK-JDBAD-AVDSZ",
+        "bot_off" : "1",
+
+        "url" : [
+            "https://lolz.guru/market/vkontakte/", "https://lolz.guru/market/epicgames/"
+        ],
+
+        "markup" : [
+            "100", "100"
+        ]
+    },
+
+    "cookie" : {
+        "xf_user" : "4909989%2Cc6c51662c6bf8d9b85f802eef921c4abe310b2fe",
+        "xf_tfa_trust" : ""
+    },
+
+    "proxies" : {
+        "choice" : "0",
+        "proxy" : "AgD19q:EA6fQu6ZF9@188.130.184.170:5500"
+    },
+
+    "telegram" : {
+        "BOT_TOKEN" : "5014726800:AAEljkC4w-fnjvo2HOOuynL9A9AbZfhIur0",
+        "chat_id" : "1939624252"
+    }
+
+}
