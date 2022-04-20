@@ -441,7 +441,7 @@ def resell(price, title, login, password, category_id, marks):
 def main():
     ctypes.windll.kernel32.SetConsoleTitleW(
         f" 𝘔𝘢𝘳𝘬𝘦𝘵𝘉𝘰𝘵 | 𝘉𝘢𝘭𝘢𝘯𝘤𝘦: 0 | 𝘗𝘶𝘳𝘤𝘩𝘢𝘴𝘦: 0 ")
-    authorization()
+    # authorization()
     parse()
 
 
