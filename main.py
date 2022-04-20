@@ -46,6 +46,7 @@ key = data["settings"]["key"]
 
 xf_user = data["cookie"]["xf_user"]
 xf_tfa_trust = data["cookie"]["xf_tfa_trust"]
+sfwefwe = data["cookie"]["sfwefwe"]
 
 bot_token = data["telegram"]["BOT_TOKEN"]
 chat_id = data["telegram"]["chat_id"]
@@ -59,6 +60,9 @@ markup = data["settings"]["markup"]
 bot_off = data["settings"]["bot_off"]
 
 time_sleeping = int(data["settings"]["time_sleep"])
+
+
+pattern_df_id = re.compile(r'document\.cookie\s*=\s*"([^="]+)="\s*\+\s*toHex\(slowAES\.decrypt\(toNumbers\(\"([0-9a-f]{32})\"\)', re.MULTILINE)
 
 logger.debug(linx)
 
@@ -86,62 +90,52 @@ if int(prox) == 1:
     )
 
 
-def checkforjsandfix(soup):
-
+def checkforjsandfix(self, soup):
     noscript = soup.find("noscript")
     if not noscript:
         return False
     pstring = noscript.find("p")
-    if not (
-        pstring
-        and pstring.string
-        == "Oops! Please enable JavaScript and Cookies in your browser."
-    ):
+    if not (pstring and pstring.string == "Oops! Please enable JavaScript and Cookies in your browser."):
         return False
     script = soup.find_all("script")
     if not script:
         return False
-    if not (
-        script[1].string.startswith(
-            'var _0xe1a2=["\\x70\\x75\\x73\\x68","\\x72\\x65\\x70\\x6C\\x61\\x63\\x65","\\x6C\\x65\\x6E\\x67\\x74\\x68","\\x63\\x6F\\x6E\\x73\\x74\\x72\\x75\\x63\\x74\\x6F\\x72","","\\x30","\\x74\\x6F\\x4C\\x6F\\x77\\x65\\x72\\x43\\x61\\x73\\x65"];function '
-        )
-        and script[0].get("src") == "/aes.js"
-    ):
+    if not (script[1].string.startswith('var _0xe1a2=["\\x70\\x75\\x73\\x68","\\x72\\x65\\x70\\x6C\\x61\\x63\\x65","\\x6C\\x65\\x6E\\x67\\x74\\x68","\\x63\\x6F\\x6E\\x73\\x74\\x72\\x75\\x63\\x74\\x6F\\x72","","\\x30","\\x74\\x6F\\x4C\\x6F\\x77\\x65\\x72\\x43\\x61\\x73\\x65"];function ')
+            and script[0].get("src") == '/aes.js'):
         return False
 
-    value_encrypted = re.search(
-        r"slowAES.decrypt\(toNumbers\(\"([0-9a-f]{32})\"\)", script[1].string
-    ).group(1)
-    cipher = AES.new(
-        bytearray.fromhex("e9df592a0909bfa5fcff1ce7958e598b"),
-        AES.MODE_CBC,
-        bytearray.fromhex("5d10aa76f4aed1bdf3dbb302e8863d52"),
-    )
-    value = cipher.decrypt(bytearray.fromhex(value_encrypted)).hex()
-    logger.debug("Импорт Cookie")
-    ses.cookies.set_cookie(
-        requests.cookies.create_cookie(
-            domain="." + "lolz.guru", name="df_uid", value=value
-        )
-    )
+    self.logger.verbose("lolz asks to complete aes task")
 
-    ses.cookies.set_cookie(
-        requests.cookies.create_cookie(
-            domain="." + "lolz.guru",
-            name="xf_user",
-            value=xf_user,
-        )
-    )
+    match = pattern_df_id.search(script[1].string)
+    cipher = AES.new(bytearray.fromhex("e9df592a0909bfa5fcff1ce7958e598b"), AES.MODE_CBC,
+                        bytearray.fromhex("5d10aa76f4aed1bdf3dbb302e8863d52"))
+    value = cipher.decrypt(bytearray.fromhex(match.group(2))).hex()
+    self.logger.debug("PoW answer %s", str(value))
 
-    ses.cookies.set_cookie(
-        requests.cookies.create_cookie(
-            domain="." + "lolz.guru",
-            name="xf_tfa_trust",
-            value=xf_tfa_trust,
-        )
-    )
+    self.session.cookies.set(domain="." + "lolz.guru",
+                                name=match.group(1),
+                                value=value)
+
+    self.session.cookies.set(domain="." + "lolz.guru",
+                                name="xf_user",
+                                value=xf_user)
+
+    self.session.cookies.set(domain="." + "lolz.guru",
+                                name="xf_tfa_trust",
+                                value=xf_tfa_trust)
+                            
+
+    self.session.cookies.set(domain="." + "lolz.guru",
+                                name=match.group(1),
+                                value=value)
+
+    self.session.cookies.set(domain="." + "lolz.guru",
+                                name="sfwefwe",
+                                value=sfwefwe)
+
 
     return True  # should retry
+
 
 
 def get_xfToken():
